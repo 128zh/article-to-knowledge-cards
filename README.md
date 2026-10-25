@@ -1,5 +1,8 @@
 # make-knowledge-cards
 
+[![CI](https://github.com/128zh/article-to-knowledge-cards/actions/workflows/ci.yml/badge.svg)](https://github.com/128zh/article-to-knowledge-cards/actions/workflows/ci.yml)
+[![Release](https://github.com/128zh/article-to-knowledge-cards/actions/workflows/release.yml/badge.svg)](https://github.com/128zh/article-to-knowledge-cards/actions/workflows/release.yml)
+
 一个把文章 / 笔记自动整理成「知识卡片」的 Agent Skill。它按 Agent Skills 开放标准编写，同时提供 Claude Code 的 `SKILL.md` 和 OpenAI/Codex 的 `agents/openai.yaml` 两套入口，方便在支持 Skill 的智能体工具中使用。
 
 ## 解决什么问题
@@ -90,3 +93,36 @@ python quick_validate.py skills/make-knowledge-cards
 ```
 
 校验规则与官方 Agent Skills 的 `quick_validate.py` 一致：检查 frontmatter 是否存在、键是否合法、`name` 是否为小写连字符、`description` 是否含尖括号或超长等。
+
+## 开发与测试
+
+本项目带有一组自动化测试和代码质量检查，依赖声明在 `requirements-dev.txt`。
+
+```bash
+# 创建虚拟环境并安装开发依赖
+python -m venv .venv
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
+pip install -r requirements-dev.txt
+
+# 运行测试
+pytest
+
+# 代码质量检查（lint + 格式）
+ruff check .
+ruff format --check .
+```
+
+测试覆盖：
+
+- `tests/test_validate.py`：校验脚本 `quick_validate.py` 的各类合法 / 非法 frontmatter 用例；
+- `tests/test_examples.py`：检查 `examples/` 中每篇原文都有对应卡片，且卡片遵循「标题 + 核心知识 + 简明解释 + 例子 / 自测」模板、数量在 1～8 张之间。
+
+## CI / CD
+
+- **CI**（`.github/workflows/ci.yml`）：在每次 Pull Request 和推送到 `main` 时触发，依次运行 Ruff 代码质量扫描、Skill 结构校验，并在 Python 3.10 / 3.11 / 3.12 上跑 pytest。
+- **CD**（`.github/workflows/release.yml`）：推送 `v*` 标签（如 `v1.0.0`）时，把 `skills/make-knowledge-cards` 打包成 zip 并发布为 GitHub Release，附带自动生成的更新说明。
+
+```
+git tag v1.0.0
+git push origin v1.0.0
+```

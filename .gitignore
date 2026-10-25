@@ -6,3 +6,13 @@
 # Python 缓存
 __pycache__/
 *.pyc
+.pytest_cache/
+.ruff_cache/
+
+# 虚拟环境
+.venv/
+venv/
+
+# 构建产物
+dist/
+*.zip
