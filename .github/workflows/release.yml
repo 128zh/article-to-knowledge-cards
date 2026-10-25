@@ -1,0 +1,26 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build & publish release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Package skill
+        run: |
+          mkdir -p dist
+          (cd skills && zip -r ../dist/make-knowledge-cards.zip make-knowledge-cards)
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/make-knowledge-cards.zip
+          generate_release_notes: true
